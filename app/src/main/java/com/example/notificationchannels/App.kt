@@ -22,7 +22,7 @@ class App : Application() {
                 NotificationManager.IMPORTANCE_HIGH
             )
             channel1.description = "this is channel 1 "
-                channel1.enableVibration(true)
+            channel1.enableVibration(true)
             channel1.lightColor=Color.RED
 
             val channel2 = NotificationChannel(
