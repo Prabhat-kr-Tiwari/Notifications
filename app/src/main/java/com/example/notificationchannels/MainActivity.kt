@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.support.v4.media.session.MediaSessionCompat
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editTextMessage: EditText
     private lateinit var buttonChannel1: Button
     private lateinit var buttonChannel2: Button
+    private lateinit var mediaSessionCompat: MediaSessionCompat
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         editTextTitle = findViewById(R.id.edit_text_title)
         editTextMessage = findViewById(R.id.edit_text_message)
         notificationManagerCompat = NotificationManagerCompat.from(this)
+        mediaSessionCompat=MediaSessionCompat(this,"tag")
 
 
         //send on channel 1
@@ -59,30 +62,26 @@ class MainActivity : AppCompatActivity() {
                 activityIntent,
                 PendingIntent.FLAG_IMMUTABLE
             )
-            val broadcastIntent = Intent(this, NotificationReceiver::class.java)
-            broadcastIntent.putExtra("toastMessage", message)
-            val actionIntent = PendingIntent.getBroadcast(
-                this,
-                0,
-                broadcastIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
 
 
             //adding the large icon
-            val largeIcon = BitmapFactory.decodeResource(resources, R.drawable.image)
+//            val largeIcon = BitmapFactory.decodeResource(resources, R.drawable.image)
+
+
+            //big picture
+            val picture = BitmapFactory.decodeResource(resources, R.drawable.image2)
 
 
             val notification = NotificationCompat.Builder(this, App.CHANNEL_1_ID)
                 .setSmallIcon(R.drawable.baseline_notifications)
                 .setContentTitle(title)
-                .setLargeIcon(largeIcon)
+                .setLargeIcon(picture)
                 .setStyle(
-                    NotificationCompat.BigTextStyle()
 
-                        .bigText(getString(R.string.dummy_text))
-                        .setBigContentTitle("Big Content Title")
-                        .setSummaryText("Summary Text")
+                    NotificationCompat.BigPictureStyle()
+                        .bigPicture(picture)
+
+
                 )
 
                 .setContentText(message)
@@ -92,7 +91,6 @@ class MainActivity : AppCompatActivity() {
                 .setColor(Color.RED)
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
-                .addAction(R.mipmap.ic_launcher, "Toast", actionIntent)
                 .build()
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -119,25 +117,29 @@ class MainActivity : AppCompatActivity() {
 
             //
 
+            val artWork = BitmapFactory.decodeResource(resources, R.drawable.image)
+
+
 
             val notification = NotificationCompat.Builder(this, App.CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.baseline_paid)
                 .setContentTitle(title)
+                .setLargeIcon(artWork)
+                .addAction(R.drawable.heart,"like",null)
+                .addAction(R.drawable.caret_left,"Previous",null)
+                .addAction(R.drawable.pause_circle,"Pause",null)
+                .addAction(R.drawable.caret_right,"Nextx",null)
+                .addAction(R.drawable.heartbreak,"Dislike",null)
                 .setStyle(
-                    NotificationCompat.InboxStyle()
-                        .addLine("This is line 1")
-                        .addLine("This is line 2")
-                        .addLine("This is line 3")
-                        .addLine("This is line 4")
-                        .addLine("This is line 5")
-                        .addLine("This is line 6")
-                        .addLine("This is line 7")
-                        .setBigContentTitle("Big Content Title")
-                        .setSummaryText("Summary Text")
+                    androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(1,2,3)
+                        .setMediaSession(mediaSessionCompat.sessionToken)
+
 
 
                 )
-
+                .setSubText("Sub Text")
+                .addAction(R.drawable.baseline_notifications,"dislike",null)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
 
