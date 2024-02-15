@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editTextMessage: EditText
     private lateinit var buttonChannel1: Button
     private lateinit var buttonChannel2: Button
-    private lateinit var mediaSessionCompat: MediaSessionCompat
 
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -55,13 +54,12 @@ class MainActivity : AppCompatActivity() {
         editTextTitle = findViewById(R.id.edit_text_title)
         editTextMessage = findViewById(R.id.edit_text_message)
         notificationManagerCompat = NotificationManagerCompat.from(this)
-        mediaSessionCompat = MediaSessionCompat(this, "tag")
 
 
-        MESSAGES.add(Message("Good Morning", "Prabhat"))
-        MESSAGES.add(Message("Good Morning", null))
-        MESSAGES.add(Message("oye", "Akash"))
-        MESSAGES.add(Message("Good Morning Prabhat", "Alexa"))
+        MESSAGES.add(MyMessage("Good Morning", Person.Builder().setName("Prabhat").build()))
+        MESSAGES.add(MyMessage("Good Morning", null))
+        MESSAGES.add(MyMessage("oye", Person.Builder().setName("Akash").build()))
+        MESSAGES.add(MyMessage("Good Morning Prabhat", Person.Builder().setName("Alexa").build()))
 
 
         //send on channel 1
@@ -161,36 +159,18 @@ class MainActivity : AppCompatActivity() {
         }
         //send on channel 2
         buttonChannel2.setOnClickListener {
-            val title = editTextTitle.text.toString()
-            val message = editTextMessage.text.toString()
 
-            //
 
-            val artWork = BitmapFactory.decodeResource(resources, R.drawable.image)
 
 
             val notification = NotificationCompat.Builder(this, App.CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.baseline_paid)
-                .setContentTitle(title)
-                .setLargeIcon(artWork)
-                .addAction(R.drawable.heart, "like", null)
-                .addAction(R.drawable.caret_left, "Previous", null)
-                .addAction(R.drawable.pause_circle, "Pause", null)
-                .addAction(R.drawable.caret_right, "Nextx", null)
-                .addAction(R.drawable.heartbreak, "Dislike", null)
-                .setStyle(
-                    androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(1, 2, 3)
-                        .setMediaSession(mediaSessionCompat.sessionToken)
+                .setContentTitle("Download")
+                .setProgress(progressMax,0,false)
 
-
-                )
-                .setSubText("Sub Text")
-                .addAction(R.drawable.baseline_notifications, "dislike", null)
-                .setContentText(message)
+                .setContentText("Download in Progress")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
 
-                .build()
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
@@ -205,34 +185,31 @@ class MainActivity : AppCompatActivity() {
                 // for ActivityCompat#requestPermissions for more details.
                 return@setOnClickListener
             }
-            notificationManagerCompat.notify(2, notification)
+            notificationManagerCompat.notify(2, notification.build())
 
         }
 
     }
 
     companion object {
+        val progressMax=100
 
 
-        val MESSAGES = mutableListOf<Message>()
+        val MESSAGES = mutableListOf<MyMessage>()
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         fun sendChannel1Notification(
             context: Context
         ) {
-            Log.d("ALEXA", "sendChannel1Notification: $MESSAGES")
 
-
-            //
             val activityIntent = Intent(context, MainActivity::class.java)
             val contentIntent = PendingIntent.getActivity(
 
                 context,
                 0,
                 activityIntent,
-                PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_MUTABLE
             )
-
             //input field of notification
             val remoteInput = RemoteInput.Builder("key_text_reply")
                 .setLabel("Your Answer.....")
@@ -252,7 +229,7 @@ class MainActivity : AppCompatActivity() {
                 .getBroadcast(context, 0, replyIntent, flag)
 
             val replyAction = NotificationCompat
-                .Action.Builder(R.drawable.send, "Reply", replyPendingIntent)
+                .Action.Builder(0, "Reply", replyPendingIntent)
                 .addRemoteInput(remoteInput).build()
 
 
@@ -283,17 +260,17 @@ class MainActivity : AppCompatActivity() {
 
 
             val notification = NotificationCompat.Builder(context, App.CHANNEL_1_ID)
-                .setSmallIcon(R.drawable.baseline_notifications)
+                .setSmallIcon(R.drawable.heart)
                 .setStyle(messagingStyle)
                 .addAction(replyAction)
                 .setColor(Color.GREEN)
 
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .setContentIntent(contentIntent)
+                /*.setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                .setContentIntent(contentIntent)*/
                 .setColor(Color.RED)
-                .setAutoCancel(true)
-                .setOnlyAlertOnce(true)
+            /*    .setAutoCancel(true)
+                .setOnlyAlertOnce(true)*/
                 .build()
 //
             val notificationManagerCompat=NotificationManagerCompat.from(context)
