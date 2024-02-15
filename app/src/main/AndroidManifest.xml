@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -23,7 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="NotificationReceiver" />
+        <service android:name=".NotificationReceiver"
+            >
+
+        </service>
     </application>
 
 </manifest>
